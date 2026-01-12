@@ -2,32 +2,30 @@
 
 namespace App\Mail;
 
+use App\Models\Order;
+use App\Models\Store;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class OrderNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public Order $order,
+        public Store $store,
+        public Collection $items
+    ) {}
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Notification Mail',
+            subject: "New Order #{$this->order->id} - {$this->store->name}",
         );
     }
 
@@ -37,17 +35,16 @@ class OrderNotificationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.order-notification',
+            with: [
+                'storeName' => $this->store->name,
+                'orderNumber' => $this->order->id,
+                'customerName' => $this->order->customer_name,
+                'customerEmail' => $this->order->customer_email,
+                'customerPhone' => $this->order->customer_phone,
+                'items' => $this->items,
+                'total' => $this->items->sum(fn($item) => $item->price * $item->quantity),
+            ]
         );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
     }
 }
