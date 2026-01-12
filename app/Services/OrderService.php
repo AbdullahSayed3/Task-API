@@ -22,22 +22,43 @@ class OrderService
     public function createOrder(array $data): Order
     {
         // 1. Validate products exist and are active
-        $productIds = collect($data['items'])->pluck('product_id')->toArray();
+        $products = $this->validateAndGetProducts($data['items']);
+
+        // 2. Calculate total and add store_id to items
+        $orderData = $this->prepareOrderData($data, $products);
+
+        // 3. Create the order
+        $order = $this->orderRepository->create($orderData);
+
+        // 4. Send emails to merchants
+        $this->sendMerchantNotifications($order);
+
+        return $order;
+    }
+
+    private function validateAndGetProducts(array $items): Collection
+    {
+        $productIds = collect($items)->pluck('product_id')->toArray();
         $products = $this->productRepository->getActiveByIds($productIds);
 
         if ($products->count() !== count($productIds)) {
-            throw new \Exception('Some products are not available');
+            throw new \App\Exceptions\ProductNotAvailableException();
         }
 
-        // 2. Calculate total and add store_id to items
+        return $products;
+    }
+
+    private function prepareOrderData(array $data, Collection $products): array
+    {
         $totalAmount = 0;
         $processedItems = [];
 
         foreach ($data['items'] as $item) {
             $product = $products->firstWhere('id', $item['product_id']);
-            
+
             if (!$product) {
-                throw new \Exception("Product {$item['product_id']} not found");
+                // Should ideally be caught by validateAndGetProducts but safe to keep check
+                throw new \App\Exceptions\ProductNotAvailableException($item['product_id']);
             }
 
             $itemTotal = $product->price * $item['quantity'];
@@ -51,21 +72,13 @@ class OrderService
             ];
         }
 
-        // 3. Create the order
-        $orderData = [
+        return [
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'],
             'customer_phone' => $data['customer_phone'],
             'total_amount' => $totalAmount,
             'items' => $processedItems,
         ];
-
-        $order = $this->orderRepository->create($orderData);
-
-        // 4. Send emails to merchants
-        $this->sendMerchantNotifications($order);
-
-        return $order;
     }
 
     /**
@@ -81,7 +94,7 @@ class OrderService
             
             // Send email to merchant
             Mail::to($store->user->email)->send(
-                new OrderNotificationMail($order, $items, $store)
+                new OrderNotificationMail($order, $store, $items)
             );
         }
     }

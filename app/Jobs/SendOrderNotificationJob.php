@@ -30,6 +30,6 @@ class SendOrderNotificationJob implements ShouldQueue
     }
 
     // Retry failed jobs
-    public int $tries = 3;
     public int $backoff = 60; // Wait 60 seconds between retries
+    public int $tries = 3;
 }

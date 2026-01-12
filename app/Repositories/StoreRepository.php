@@ -16,4 +16,9 @@ class StoreRepository implements StoreRepositoryInterface
     {
         return Store::find($id);
     }
+
+    public function create(array $data): Store
+    {
+        return Store::create($data);
+    }
 }

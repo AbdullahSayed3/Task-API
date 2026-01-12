@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreOrderRequest extends FormRequest
+class StoreOrderRequest extends BaseRequest
 {
     public function authorize(): bool
     {
@@ -38,17 +38,5 @@ class StoreOrderRequest extends FormRequest
             'items.*.quantity.required' => 'Quantity is required',
             'items.*.quantity.min' => 'Quantity must be at least 1',
         ];
-    }
-
-    // Handle validation failures with JSON response
-    protected function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(
-            response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422)
-        );
     }
 }

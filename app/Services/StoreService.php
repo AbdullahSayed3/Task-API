@@ -15,4 +15,10 @@ class StoreService
     {
         return $this->storeRepository->getByUserId($userId);
     }
+
+    public function createStore(array $data, int $userId): Store
+    {
+        $data['user_id'] = $userId;
+        return $this->storeRepository->create($data);
+    }
 }

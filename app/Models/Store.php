@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
+/**
+ * @property-read \App\Models\User $user
+ */
 class Store extends Model
 {
     use HasFactory;

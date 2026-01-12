@@ -16,11 +16,13 @@ class Product extends Model
         'name',
         'description',
         'price',
-        'stock'
+        'stock',
+        'is_active',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     public function store(): BelongsTo
@@ -31,5 +33,9 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

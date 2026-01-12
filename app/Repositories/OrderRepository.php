@@ -14,22 +14,15 @@ class OrderRepository implements OrderRepositoryInterface
     {
         return DB::transaction(function () use ($data) {
             // create order
-            $order = Order::create([
-                'customer_name' => $data['customer_name'],
-                'customer_email' => $data['customer_email'],
-                'customer_phone' => $data['customer_phone'],
-                'total_amount' => $data['total_amount'],
-                'status' => 'pending',
-            ]);
+            $order = Order::create(array_merge($data, ['status' => 'pending']));
 
             // add items
             foreach ($data['items'] as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
+                $order->orderItems()->create([
                     'product_id' => $item['product_id'],
                     'store_id' => $item['store_id'],
-                    'quantity' => $item['quantity'],
                     'price' => $item['price'],
+                    'quantity' => $item['quantity'],
                 ]);
             }
 

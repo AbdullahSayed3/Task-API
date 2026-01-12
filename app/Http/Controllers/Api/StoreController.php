@@ -40,4 +40,17 @@ class StoreController extends Controller
             'Store orders retrieved successfully'
         );
     }
+
+    /**
+     * Create a new store
+     */
+    public function store(\App\Http\Requests\StoreStoreRequest $request)
+    {
+        $store = $this->storeService->createStore($request->validated(), $request->user()->id);
+
+        return $this->createdResponse(
+            new \App\Http\Resources\StoreResource($store),
+            'Store created successfully'
+        );
+    }
 }
