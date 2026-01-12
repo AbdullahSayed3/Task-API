@@ -3,6 +3,13 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Repositories\Contracts\StoreRepositoryInterface;
+use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Repositories\OrderRepository;
+use App\Repositories\StoreRepository;
+use App\Repositories\ProductRepository;
+
 
 class AppServiceProvider extends ServiceProvider
 {
