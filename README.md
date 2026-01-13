@@ -32,6 +32,7 @@ Multi-vendor order system API built with Laravel. This project provides a robust
    ```
 7. Start the development server:
    ```
+   php artisan queue:work
    php artisan serve
    ```
 
