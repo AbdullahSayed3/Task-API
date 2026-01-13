@@ -6,11 +6,11 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\StoreController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
-// Public routes
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Order management for customers
 Route::post('/orders', [OrderController::class, 'store']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
 
@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::middleware(\App\Http\Middleware\CheckUserRole::class . ':admin')->group(function () {
         Route::post('/stores', [StoreController::class, 'store']);
+        Route::post('/products', [\App\Http\Controllers\Api\ProductController::class, 'store']);
     });
     
     Route::get('/store/orders', [StoreController::class, 'orders']);

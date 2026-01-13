@@ -10,4 +10,6 @@ interface ProductRepositoryInterface
     public function getActiveByIds(array $productIds): Collection;
     
     public function find(int $id): ?Product;
+
+    public function create(array $data): Product;
 }
